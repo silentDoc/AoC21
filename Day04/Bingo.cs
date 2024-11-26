@@ -60,7 +60,26 @@ namespace AoC21.Day04
             return -1;
         }
 
+        int FindLastWinner()
+        {
+            Board? lastWinner = null;
+            int numBoards = boards.Count();
+            
+            foreach (var number in numbers)
+            {
+                boards.ForEach(b => b.Receive(number));
+                var numWinners = boards.Count(x => x.Winner());
+                if (numWinners == numBoards-1)
+                    lastWinner = boards.Single(x => !x.Winner());
+
+                if (numWinners == numBoards)
+                    break;
+            }
+
+            return lastWinner != null  ? lastWinner.Score : -1;
+        }
+
         public int Solve(int part = 1)
-            => FindWinner();
+            => part == 1 ? FindWinner() : FindLastWinner();
     }
 }
