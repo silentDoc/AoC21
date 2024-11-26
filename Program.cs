@@ -6,7 +6,7 @@ namespace AoC21
     {
         static void Main(string[] args)
         {
-            int day = 1;
+            int day = 2;
             int part = 1;
             bool test = false;
             int testNum = 0;
@@ -39,9 +39,9 @@ namespace AoC21
         static string day2(string input, int part)
         {
             var lines = File.ReadAllLines(input).ToList();
-            //Day01.SonarSweep sweep = new();
-            //sweep.ParseInput(lines);
-            return "";//sweep.Solve(part).ToString();
+            Day02.SubmarineNavi sub = new();
+            sub.ParseInput(lines);
+            return sub.Solve(part).ToString();
         }
     }
 }
