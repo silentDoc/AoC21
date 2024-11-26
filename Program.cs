@@ -7,7 +7,7 @@ namespace AoC21
         static void Main(string[] args)
         {
             int day = 1;
-            int part = 2;
+            int part = 1;
             bool test = false;
             int testNum = 0;
 
@@ -20,6 +20,7 @@ namespace AoC21
             string result = day switch
             {
                 1 => day1(input, part),
+                2 => day2(input, part),
                 _ => throw new ArgumentException("Wrong day number - unimplemented")
             };
             st.Stop();
@@ -33,6 +34,14 @@ namespace AoC21
             Day01.SonarSweep sweep = new();
             sweep.ParseInput(lines);
             return sweep.Solve(part).ToString();
+        }
+
+        static string day2(string input, int part)
+        {
+            var lines = File.ReadAllLines(input).ToList();
+            //Day01.SonarSweep sweep = new();
+            //sweep.ParseInput(lines);
+            return "";//sweep.Solve(part).ToString();
         }
     }
 }
