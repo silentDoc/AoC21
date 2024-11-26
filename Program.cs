@@ -7,7 +7,7 @@ namespace AoC21
         static void Main(string[] args)
         {
             int day = 3;
-            int part = 1;
+            int part = 2;
             bool test = false;
             int testNum = 0;
 
