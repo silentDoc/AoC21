@@ -11,11 +11,11 @@ namespace AoC21.Day01
         int SolvePart2()
         {
             var windows = readings.Windowed(3).Select(x => x.Sum()).ToList();   // Common - Listutils
-            return Enumerable.Range(1, windows.Count() - 1).Select(i => windows[i] - windows[i - 1]).Count(r => r > 0);
+            return windows.Zip(windows.Skip(1), (x, y) => y - x).Count(r => r > 0);
         }
 
         public int Solve(int part = 1)
-            => part == 1 ? Enumerable.Range(1, readings.Count() - 1).Select(i => readings[i] - readings[i - 1]).Count(r => r > 0)
+            => part == 1 ? readings.Zip(readings.Skip(1), (x,y) => y-x).Count(r => r > 0)
                          : SolvePart2(); 
     }
 }
