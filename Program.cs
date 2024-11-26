@@ -8,7 +8,7 @@ namespace AoC21
         {
             int day = 4;
             int part = 1;
-            bool test = !false;
+            bool test = false;
             int testNum = 0;
 
             string input = "./Input/day" + day.ToString("00");
@@ -57,9 +57,9 @@ namespace AoC21
         static string day4(string input, int part)
         {
             var lines = File.ReadAllLines(input).ToList();
-            //Day03.SubDiagnostic diag = new();
-            //diag.ParseInput(lines);
-            return ""; //diag.Solve(part).ToString();
+            Day04.Bingo bingo = new();
+            bingo.ParseInput(lines);
+            return bingo.Solve(part).ToString();
         }
     }
 }
