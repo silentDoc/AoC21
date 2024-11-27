@@ -10,7 +10,7 @@ namespace AoC21.Day05
 
         public Line(string input)
         {
-            var values = input.Split(" -> ").Select(x => x.Split(',')).SelectMany(x =>x).Select(int.Parse).ToList();
+            var values = input.Replace(" -> ", ",").Split(",").Select(int.Parse).ToList();
             start = (values[0], values[1]);
             end = (values[2], values[3]);
         }
@@ -20,27 +20,18 @@ namespace AoC21.Day05
 
         public HashSet<Coord2D> Points()
         {
-            if (!VerticalOrHorizontal)
-                return points;
-
             if (points.Count() > 0)
                 return points;
 
-            if (start.x == end.x)
-            {
-                var p0 = (start.y < end.y) ? start.y : end.y;
-                var p1 = (start.y < end.y) ? end.y : start.y;
+            var direction = end - start;
+            direction = direction / (direction.x == 0 ? Math.Abs(direction.y) : Math.Abs(direction.x));
 
-                for (int i = p0; i <= p1; i++)
-                    points.Add((start.x, i));
-            }
-            else
+            var current = start;
+            points.Add(current);
+            while (current != end)
             {
-                var p0 = (start.x < end.x) ? start.x : end.x;
-                var p1 = (start.x < end.x) ? end.x : start.x;
-
-                for (int i = p0; i <= p1; i++)
-                    points.Add((i, start.y));
+                current += direction;
+                points.Add(current);
             }
             
             return points;
@@ -53,10 +44,10 @@ namespace AoC21.Day05
         public void ParseInput(List<string> input)
             => input.ForEach(x => lines.Add(new Line(x)));
 
-        int SolvePart1()
+        int FindOverlap(int part =1)
         { 
-            var hv = lines.Where(x => x.VerticalOrHorizontal).ToList();
-            var allPoints = hv.SelectMany(x => x.Points());
+            var lineSet = part == 1 ? lines.Where(x => x.VerticalOrHorizontal).ToList() : lines;
+            var allPoints = lineSet.SelectMany(x => x.Points());
             var pointDict = allPoints.GroupBy(x => x).Select(g => new { Point = g.Key, Amount = g.Count() })
                                      .ToDictionary(x => x.Point, x => x.Amount);
 
@@ -64,6 +55,6 @@ namespace AoC21.Day05
         }
 
         public int Solve(int part = 1)
-            => SolvePart1();
+            => FindOverlap(part);
     }
 }
