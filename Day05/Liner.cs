@@ -20,7 +20,7 @@ namespace AoC21.Day05
 
         public HashSet<Coord2D> Points()
         {
-            if (points.Count() > 0)
+            if (points.Any())
                 return points;
 
             var direction = end - start;
