@@ -1,6 +1,4 @@
-﻿using static System.Runtime.InteropServices.JavaScript.JSType;
-
-namespace AoC21.Day08
+﻿namespace AoC21.Day08
 {
     class SignalTest
     { 
