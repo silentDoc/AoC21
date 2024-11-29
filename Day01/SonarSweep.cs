@@ -1,4 +1,4 @@
-﻿using AoC20.Common;
+﻿using AoC21.Common;
 
 namespace AoC21.Day01
 {

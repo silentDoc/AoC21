@@ -1,4 +1,4 @@
-﻿namespace AoC20.Common
+﻿namespace AoC21.Common
 {
     public static class ListUtils
     {

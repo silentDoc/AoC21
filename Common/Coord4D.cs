@@ -1,4 +1,4 @@
-﻿namespace AoC20.Common
+﻿namespace AoC21.Common
 {
     public class Coord4D : IEquatable<Coord4D>
     {

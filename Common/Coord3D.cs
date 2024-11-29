@@ -1,4 +1,4 @@
-﻿namespace AoC20.Common
+﻿namespace AoC21.Common
 {
     public class Coord3D : IEquatable<Coord3D>
     {
