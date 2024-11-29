@@ -6,9 +6,9 @@ namespace AoC21
     {
         static void Main(string[] args)
         {
-            int day = 12;
+            int day = 13;
             int part = 1;
-            bool test = false;
+            bool test = !false;
             int testNum = 0;
 
             string input = "./Input/day" + day.ToString("00");
@@ -31,6 +31,7 @@ namespace AoC21
                 10 => day10(input, part),
                 11 => day11(input, part),
                 12 => day12(input, part),
+                13 => day13(input, part),
                 _ => throw new ArgumentException("Wrong day number - unimplemented")
             };
             st.Stop();
@@ -132,6 +133,15 @@ namespace AoC21
             Day12.CaveExplorer daySolver = new();
             daySolver.ParseInput(lines);
             return daySolver.Solve(part).ToString();
+        }
+
+        static string day13(string input, int part)
+        {
+            var lines = File.ReadAllLines(input).ToList();
+            //Day12.CaveExplorer daySolver = new();
+            //daySolver.ParseInput(lines);
+            //return daySolver.Solve(part).ToString();
+            return "";
         }
     }
 }
