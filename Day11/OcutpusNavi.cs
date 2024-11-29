@@ -50,7 +50,19 @@ namespace AoC21.Day11
             return retVal;
         }
 
+        int FindSyncStep()
+        {
+            int retVal = 0;
+            while (energyMap.Values.Any(x => x != 0))
+            {
+                DoStep();
+                retVal++;
+            }
+
+            return retVal;
+        }
+
         public int Solve(int part = 1)
-            => FindNumFlashes();
+            => part == 1 ? FindNumFlashes() : FindSyncStep();
     }
 }
