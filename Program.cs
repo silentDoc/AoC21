@@ -30,6 +30,7 @@ namespace AoC21
                 9 => day9(input, part),
                 10 => day10(input, part),
                 11 => day11(input, part),
+                12 => day12(input, part),
                 _ => throw new ArgumentException("Wrong day number - unimplemented")
             };
             st.Stop();
@@ -123,6 +124,15 @@ namespace AoC21
             Day11.OcutpusNavi daySolver = new();
             daySolver.ParseInput(lines);
             return daySolver.Solve(part).ToString();
+        }
+
+        static string day12(string input, int part)
+        {
+            var lines = File.ReadAllLines(input).ToList();
+            //Day11.OcutpusNavi daySolver = new();
+            //daySolver.ParseInput(lines);
+            //return daySolver.Solve(part).ToString();
+            return "";
         }
     }
 }
