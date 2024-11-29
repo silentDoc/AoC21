@@ -44,7 +44,34 @@
             return retVal;
         }
 
+        int TraverseTwice(string currentNode, string[] visitedSmallCaves, bool visitedTwice)
+        {
+            bool bNewVisitedTwice = visitedTwice;
+
+            if (currentNode == "end")
+                return 1;
+
+            if (visitedSmallCaves.Contains(currentNode) && currentNode == "start")
+                return 0;
+
+            if (visitedSmallCaves.Contains(currentNode) && visitedTwice)
+                return 0;
+
+            if(visitedSmallCaves.Contains(currentNode) && !visitedTwice)
+                bNewVisitedTwice = true;
+
+            int retVal = 0;
+
+            string[] newVisited = isSmallCave(currentNode) ? [.. visitedSmallCaves, currentNode] : [.. visitedSmallCaves];
+
+            var connections = paths[currentNode];
+            foreach (var connection in connections)
+                retVal += TraverseTwice(connection, newVisited, bNewVisitedTwice);
+
+            return retVal;
+        }
+
         public int Solve(int part = 1)
-            => Traverse("start", []);
+            => part == 1 ?  Traverse("start", []) : TraverseTwice("start", [], false);
     }
 }
