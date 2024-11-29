@@ -25,26 +25,7 @@
         bool isSmallCave(string node)
             => node.All(x => char.IsLower(x));
 
-        int Traverse(string currentNode, string[] visitedSmallCaves)
-        {
-            if (currentNode == "end")
-                return 1;
-
-            if (visitedSmallCaves.Contains(currentNode))
-                return 0;
-
-            int retVal = 0;
-
-            string[] newVisited = isSmallCave(currentNode) ? [.. visitedSmallCaves, currentNode] : [.. visitedSmallCaves];
-
-            var connections = paths[currentNode];
-            foreach (var connection in connections)
-                retVal += Traverse(connection, newVisited);
-            
-            return retVal;
-        }
-
-        int TraverseTwice(string currentNode, string[] visitedSmallCaves, bool visitedTwice)
+        int Traverse(string currentNode, string[] visitedSmallCaves, bool visitedTwice)
         {
             bool bNewVisitedTwice = visitedTwice;
 
@@ -66,12 +47,12 @@
 
             var connections = paths[currentNode];
             foreach (var connection in connections)
-                retVal += TraverseTwice(connection, newVisited, bNewVisitedTwice);
+                retVal += Traverse(connection, newVisited, bNewVisitedTwice);
 
             return retVal;
         }
 
         public int Solve(int part = 1)
-            => part == 1 ?  Traverse("start", []) : TraverseTwice("start", [], false);
+            => part == 1 ? Traverse("start", [], true) : Traverse("start", [], false);
     }
 }
