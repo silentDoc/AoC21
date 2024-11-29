@@ -17,7 +17,7 @@
                 ('<', '>') => true,
                 _ => false
             };
-
+       
         int charScore(char delimiter)
             => delimiter switch
                 {
@@ -27,6 +27,16 @@
                     '>' => 25137,
                     _ => throw new Exception("Unknown delimiter " + delimiter.ToString())
                 };
+
+        int closerScore(char delimiter)
+            => delimiter switch
+            {
+                '(' => 1,
+                '[' => 2,
+                '{' => 3,
+                '<' => 4,
+                _ => throw new Exception("Unknown delimiter " + delimiter.ToString())
+            };
 
         int GetScore(string line)
         { 
@@ -49,7 +59,33 @@
             return 0;
         }
 
-        public int Solve(int part = 1)
-            => lines.Sum(x => GetScore(x));
+        long CompleteLine(string line)
+        {
+            Stack<char> stack = new();
+
+            foreach (var delimiter in line)
+                if (opening.Contains(delimiter))
+                    stack.Push(delimiter);
+                else
+                    stack.Pop();
+
+            long score = 0;
+            while (stack.Count > 0)
+                score = score*5 + closerScore(stack.Pop());
+
+            return score;
+        }
+
+        long AutocompleteScore()
+        {
+            var sortedScores = lines.Where(x => GetScore(x) == 0)
+                                    .Select(l => CompleteLine(l))
+                                    .OrderBy(x => x);
+
+            return sortedScores.Skip(sortedScores.Count() / 2).First();
+        }
+
+        public long Solve(int part = 1)
+            => part == 1 ? lines.Sum(x => GetScore(x)) : AutocompleteScore();
     }
 }
