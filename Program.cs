@@ -6,8 +6,8 @@ namespace AoC21
     {
         static void Main(string[] args)
         {
-            int day = 11;
-            int part = 2;
+            int day = 12;
+            int part = 1;
             bool test = false;
             int testNum = 0;
 
@@ -129,10 +129,9 @@ namespace AoC21
         static string day12(string input, int part)
         {
             var lines = File.ReadAllLines(input).ToList();
-            //Day11.OcutpusNavi daySolver = new();
-            //daySolver.ParseInput(lines);
-            //return daySolver.Solve(part).ToString();
-            return "";
+            Day12.CaveExplorer daySolver = new();
+            daySolver.ParseInput(lines);
+            return daySolver.Solve(part).ToString();
         }
     }
 }
