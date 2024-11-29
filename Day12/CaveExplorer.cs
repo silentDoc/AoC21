@@ -27,7 +27,7 @@
 
         int Traverse(string currentNode, string[] visitedSmallCaves, bool visitedTwice)
         {
-            bool bNewVisitedTwice = visitedTwice;
+            bool newVisitedTwice = visitedTwice;
 
             if (currentNode == "end")
                 return 1;
@@ -39,15 +39,14 @@
                 return 0;
 
             if(visitedSmallCaves.Contains(currentNode) && !visitedTwice)
-                bNewVisitedTwice = true;
+                newVisitedTwice = true;
 
             int retVal = 0;
-
+            var connections = paths[currentNode];
             string[] newVisited = isSmallCave(currentNode) ? [.. visitedSmallCaves, currentNode] : [.. visitedSmallCaves];
 
-            var connections = paths[currentNode];
             foreach (var connection in connections)
-                retVal += Traverse(connection, newVisited, bNewVisitedTwice);
+                retVal += Traverse(connection, newVisited, newVisitedTwice);
 
             return retVal;
         }
