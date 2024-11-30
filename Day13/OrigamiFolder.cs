@@ -1,4 +1,5 @@
 ﻿using AoC21.Common;
+using System.Text;
 
 namespace AoC21.Day13
 {
@@ -63,6 +64,22 @@ namespace AoC21.Day13
                 origami = (fold.dir == 'x') ? FoldVertical(origami, fold.value) : FoldHorizontal(origami, fold.value);
                 if (part == 1)
                     break;
+            }
+
+            if (part == 2)
+            {
+                // Display code
+                int maxX = origami.Max(p => p.x);
+                int maxY = origami.Max(p => p.y);
+
+                for (int j = 0; j <= maxY; j++)
+                { 
+                    StringBuilder sb = new StringBuilder();
+                    for (int i = 0; i <= maxX; i++)
+                        sb.Append( origami.Contains((i,j)) ? '*' : ' ' );
+
+                    Console.WriteLine(sb.ToString());
+                }
             }
 
             return origami.Count;
