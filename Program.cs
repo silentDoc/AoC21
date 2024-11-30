@@ -8,7 +8,7 @@ namespace AoC21
         {
             int day = 14;
             int part = 1;
-            bool test = !false;
+            bool test = false;
             int testNum = 0;
 
             string input = "./Input/day" + day.ToString("00");
@@ -147,10 +147,9 @@ namespace AoC21
         static string day14(string input, int part)
         {
             var lines = File.ReadAllLines(input).ToList();
-            //Day13.OrigamiFolder daySolver = new();
-            //daySolver.ParseInput(lines);
-            //return daySolver.Solve(part).ToString();
-            return "";
+            Day14.Polymerizator daySolver = new();
+            daySolver.ParseInput(lines);
+            return daySolver.Solve(part).ToString();
         }
     }
 }
