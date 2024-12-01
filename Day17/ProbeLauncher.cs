@@ -33,7 +33,7 @@ namespace AoC21.Day17
             Coord2D pos = new(0, 0);
             Coord2D vel = velocity;
 
-            int maxY = -1;
+            int maxY = int.MinValue;
             bool hit = false;
 
             for(int i=0; i<steps; i++)
@@ -46,33 +46,33 @@ namespace AoC21.Day17
                 vel.x += vel.x > 0 ? -1 : vel.x < 0 ? 1 : 0;
                 vel.y--;
 
-                if (pos.x < area.TopLeft.x)
-                    continue;
-
-
                 if (area.IsInArea(pos))
                     hit = true;
 
                 if (pos.y > maxY)
                     maxY = pos.y;
             }
-            return hit ? maxY : -1;
+            return hit ? maxY : int.MinValue;
         }
 
         int FindTrajectory(int part = 1)
         {
             // Bruteforce ftw
             int maxHeight = -1;
+            int numSetups = 0;
 
-            for (int x = 0; x < 200; x++)
-                for (int y = 0; y < 200; y++)
+            for (int x = 0; x < 500; x++)
+                for (int y = -500; y < 500; y++)
                 {
                     var height = SimLaunch(new Coord2D(x, y), 500);
+                    if (height > int.MinValue)
+                        numSetups++;
+
                     if (height > maxHeight)
                         maxHeight = height;
                 }
             
-            return maxHeight;
+            return part == 1 ? maxHeight : numSetups;
         }
 
 
