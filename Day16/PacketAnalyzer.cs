@@ -18,8 +18,19 @@
         public int GetVersionSum
             => Version + Children.Select(x => x.GetVersionSum).Sum();
 
-        public int GetCount
-           => 1 + Children.Select(x => x.GetCount).Sum();
+        public long Solve
+            => Type switch
+            {
+                0 => Children.Select(x => x.Solve).Sum(),
+                1 => Children.Select(x => x.Solve).Aggregate(1, (long acum, long element) => acum *  element ),
+                2 => Children.Select(x => x.Solve).Min(),
+                3 => Children.Select(x => x.Solve).Max(),
+                4 => Value,
+                5 => Children[0].Solve > Children[1].Solve ? 1 :0,
+                6 => Children[0].Solve < Children[1].Solve ? 1 : 0,
+                7 => Children[0].Solve == Children[1].Solve ? 1 : 0,
+                _ => throw new Exception("Invalid Type : " + Type.ToString())
+            };
     }
 
     class BitReader
@@ -120,14 +131,14 @@
         public void ParseInput(List<string> lines)
             => input = lines[0];
 
-        int FindVersionSum()
+        long FindSolution(int part =1)
         {
             PacketParser parser = new();
             var packet = parser.Parse(input);
-            return packet.GetVersionSum;
+            return part == 1 ? packet.GetVersionSum : packet.Solve;
         }
 
-        public int Solve(int part = 1)
-            => FindVersionSum();
+        public long Solve(int part = 1)
+            => FindSolution(part);
     }
 }
