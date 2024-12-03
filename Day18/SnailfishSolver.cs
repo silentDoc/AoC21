@@ -215,8 +215,23 @@ namespace AoC21.Day18
             return acum.Magnitude;
         }
 
+        int HighestSum()
+        {
+            int max = 0;
+            for (int i = 0; i < snailNumbers.Count() - 1; i++)
+                for (int j = i + 1; j < snailNumbers.Count() - 1; j++)
+                {
+                    var sum = snailNumbers[i].Add(snailNumbers[j]);
+                    var magnitude = sum.Magnitude;
+
+                    max = (magnitude > max) ? magnitude : max;
+                }
+
+            return max;
+        }
+
         public int Solve(int part = 1)
-            => SumAll();
+            => part == 1 ? SumAll() : HighestSum();
     }
 }
 
