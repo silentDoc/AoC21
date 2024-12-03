@@ -8,8 +8,8 @@ namespace AoC21
         {
             int day = 18;
             int part = 1;
-            bool test = !false;
-            int testNum = 0;
+            bool test = false;
+            int testNum = 1;
 
             string input = "./Input/day" + day.ToString("00");
             input += (test) ? "_test" + (testNum > 0 ? testNum.ToString() : "") + ".txt" : ".txt";
@@ -183,10 +183,9 @@ namespace AoC21
         static string day18(string input, int part)
         {
             var lines = File.ReadAllLines(input).ToList();
-            //Day17.ProbeLauncher daySolver = new();
-            //daySolver.ParseInput(lines);
-            //return daySolver.Solve(part).ToString();
-            return "";
+            Day18.SnailfishSolver daySolver = new();
+            daySolver.ParseInput(lines);
+            return daySolver.Solve(part).ToString();
         }
     }
 }
