@@ -1,0 +1,190 @@
+﻿using AoC21.Common;
+using System.Data;
+
+namespace AoC21.Day19
+{
+    delegate Coord3D Transform(Coord3D point);
+
+    static class RotationUtils
+    {
+        // Helper function to compose two Transform functions
+        static Transform Compose(Transform t1, Transform t2)
+            => coord => t2(t1(coord));
+
+        // Null transform (identity transformation) adn basic rotations
+        static readonly Transform NullTrans = coord => coord;
+        static readonly Transform RotX = point => new Coord3D(point.x, -point.z, point.y);
+        static readonly Transform RotY = point => new Coord3D(point.z, point.y, -point.x);
+        static readonly Transform RotZ = point => new Coord3D(-point.y, point.x, point.z);
+
+        // Rotation in 3D space is an endomorphism of the 3D space, i.e. a function from R^3 to R^3
+        // We can represent it as a 3x3 matrix, but we can also represent it as a composition of simpler transformations
+        public static IEnumerable<Coord3D> GetAllRotations(Coord3D point)
+        {
+            // Define rotations as combinations of ras and rbs
+            var ras = new List<Transform>
+                {
+                    NullTrans,
+                    RotY,
+                    Compose(RotY, RotY),
+                    Compose(Compose(RotY, RotY), RotY),
+                    RotZ,
+                    Compose(RotZ, Compose(RotZ, RotZ))
+                };
+
+            var rbs = new List<Transform>
+                {
+                    NullTrans,
+                    RotX,
+                    Compose(RotX, RotX),
+                    Compose(Compose(RotX, RotX), RotX)
+                };
+
+            // Apply all combinations of ras and rbs to the point
+            foreach (var ra in ras)
+                foreach (var rb in rbs)
+                    yield return rb(ra(point));
+        }
+    }
+
+    class Scan
+    {
+        public int Id = -1;
+        public Coord3D scannerPosition = (0, 0, 0);
+        public List<Coord3D> beacons = new List<Coord3D>();
+        public double[][] distances;
+
+        // Beacons normalized to the first scanner position
+        public int RotationIndex = -1;
+        public List<Coord3D> normalizedBeacons = new List<Coord3D>();
+        public Coord3D normalizedScannerPos = new Coord3D(0, 0, 0);
+        
+
+        public Scan(List<string> inputSection)
+        {
+            var idStr = inputSection[0].Replace("--- scanner ", "").Replace(" ---", "");
+            Id = int.Parse(idStr);
+
+            var inputValues = inputSection.Skip(1).Select(x => x.Split(',').Select(int.Parse).ToList()).ToList();
+            inputValues.ForEach(x => beacons.Add(new Coord3D(x[0], x[1], x[2])));
+
+            distances = new double[beacons.Count][];
+            for (int i = 0; i < beacons.Count; i++)
+            {
+                distances[i] = new double[beacons.Count];
+                for (int j = 0; j < beacons.Count; j++)
+                    distances[i][j] = beacons[i].DistanceTo(beacons[j]);
+            }
+        }
+
+        // Normalize the beacons to the first scanner position (0,0,0)
+        public void NormalizeBeacons()
+            => normalizedBeacons = beacons.Select(x => RotationUtils.GetAllRotations(x).ToList()[RotationIndex] + normalizedScannerPos).ToList();
+
+        public Coord3D? Register(Scan other)
+        {
+            // Step 1 - Find the beacons that are in the same relative position in both scanners
+            //
+            // Find the points from the other scanner that have the same distance between them
+            // as the points in this scanner. This means that there will be rows or columns that
+            // will have more than 3 elements with the same values
+
+            List<Coord3D> goodBeacons = new();
+            List<Coord3D> goodBeaconsOther = new();
+
+            foreach (var (index, row) in distances.Index())
+            {
+                // Each row has the distance from the current beacon to all other beacons
+                var rowValues = row.Select(x => Math.Round(x, 2)).ToArray();
+
+                foreach (var (indexOther, otherRow) in other.distances.Index())
+                {
+                    var otherRowValues = otherRow.Select(x => Math.Round(x, 2)).ToArray();
+                    var intersection = otherRowValues.Intersect(rowValues).ToList();
+
+                    // If we find a row of the other scanner that has at least 12 elements in common with the current row
+                    // we consider it interesting, because it means that the beacons are in the same relative position
+                    if (otherRowValues.Intersect(rowValues).Count() >= 12)
+                    {
+                        goodBeacons.Add(normalizedBeacons[index]);          // We take the already normalized beacons , to help with next step
+                        goodBeaconsOther.Add(other.beacons[indexOther]);
+                    }
+                }
+            }
+
+            // Step 2 - If we have a good number of beacons, find the exact rotation that allow us to locate the scanner
+            if (goodBeacons.Count>=12)
+            {
+                List<List<Coord3D>> matchingBeaconsRotations = goodBeaconsOther.Select(x => RotationUtils.GetAllRotations(x).ToList()).ToList();
+                int rotationLength = matchingBeaconsRotations[0].Count;
+                List<Coord3D> possibleOtherScannerPositions = new();
+
+                // The trick here is that when we find the right rotation, there will be only one possible scanner poisition
+                // if the rotation is bad, the x coords will match with y or Z and then there will be 12 different potential positions
+                for (int i = 0; i < rotationLength; i++)
+                {
+                    List<Coord3D> rotatedBeacons = matchingBeaconsRotations.Select(x => x[i]).ToList();
+                    possibleOtherScannerPositions = new();
+
+                    for (int j = 0; j < goodBeacons.Count; j++)
+                    {
+                        // Step 1 - Find the real position of the beacon with respect to our beacon scanner pos (known)
+                        var beaconPos = goodBeacons[j];
+                        var otherPos = rotatedBeacons[j];
+                        var realBeaconPosition = beaconPos + scannerPosition;
+                        var otherScannerPosition = realBeaconPosition - otherPos;
+                        possibleOtherScannerPositions.Add(otherScannerPosition);
+                    }
+
+                    if (possibleOtherScannerPositions.Distinct().Count() == 1)
+                    { 
+                        other.RotationIndex = i;
+                        other.normalizedScannerPos = possibleOtherScannerPositions[0];
+                        other.NormalizeBeacons();
+                    }
+                }
+            }
+            else
+                return null;
+
+            return other.normalizedScannerPos;
+        }
+    }
+
+    internal class BeaconScanner
+    {
+        List<Scan> scanList = [];
+
+        public void ParseInput(List<string> input)
+        {
+            var sections = ParseUtils.SplitBy(input, "");
+            sections.ForEach(x => scanList.Add(new Scan(x)));
+
+            scanList[0].RotationIndex = 0;
+            scanList[0].normalizedScannerPos = (0, 0, 0);
+            scanList[0].NormalizeBeacons();
+        }
+
+        int RegisterScans()
+        {
+            List<Scan> registeredScanners = [scanList[0]];
+            List<Scan> nonRegisteredScanners = scanList.Skip(1).ToList();
+
+            while (nonRegisteredScanners.Count > 0)
+            {
+                foreach (var nonRegScan in nonRegisteredScanners)
+                    foreach (var regScan in registeredScanners)
+                        regScan.Register(nonRegScan);
+
+                registeredScanners = scanList.Where(x => x.RotationIndex != -1).ToList();
+                nonRegisteredScanners = scanList.Where(x => x.RotationIndex == -1).ToList();
+            }
+            
+            return registeredScanners.SelectMany(x => x.normalizedBeacons).Distinct().Count();
+        }
+
+        public int Solve(int part = 1)
+            => RegisterScans();
+        
+    }
+}

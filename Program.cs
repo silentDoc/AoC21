@@ -8,8 +8,8 @@ namespace AoC21
         {
             int day = 19;
             int part = 1;
-            bool test = !false;
-            int testNum = 1;
+            bool test = false;
+            int testNum = 0;
 
             string input = "./Input/day" + day.ToString("00");
             input += (test) ? "_test" + (testNum > 0 ? testNum.ToString() : "") + ".txt" : ".txt";
@@ -37,6 +37,7 @@ namespace AoC21
                 16 => day16(input, part),
                 17 => day17(input, part),
                 18 => day18(input, part),
+                19 => day19(input, part),
                 _ => throw new ArgumentException("Wrong day number - unimplemented")
             };
             st.Stop();
@@ -191,9 +192,9 @@ namespace AoC21
         static string day19(string input, int part)
         {
             var lines = File.ReadAllLines(input).ToList();
-            //Day19 daySolver = new();
-            //daySolver.ParseInput(lines);
-            return ""; // daySolver.Solve(part).ToString();
+            Day19.BeaconScanner daySolver = new();
+            daySolver.ParseInput(lines);
+            return daySolver.Solve(part).ToString();
         }
     }
 }

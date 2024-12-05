@@ -97,6 +97,9 @@
         public double VectorModule
             => Math.Sqrt(x * x + y * y + z * z);
 
+        public double DistanceTo(Coord3D other)
+            => (this - other).VectorModule;
+
         public override int GetHashCode()
         {
             unchecked // Wraps around max value
@@ -109,10 +112,6 @@
             }
         }
         public override string ToString()
-        {
-            return x.ToString() + "," + y.ToString() + "," + z.ToString();
-        }
-
-
+            => x.ToString() + "," + y.ToString() + "," + z.ToString();
     }
 }
