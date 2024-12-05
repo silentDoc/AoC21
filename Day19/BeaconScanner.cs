@@ -113,42 +113,34 @@ namespace AoC21.Day19
                 }
             }
 
+            if (goodBeacons.Count < 12)
+                return null;
+
             // Step 2 - If we have a good number of beacons, find the exact rotation that allow us to locate the scanner
-            if (goodBeacons.Count>=12)
+            List<List<Coord3D>> matchingBeaconsRotations = goodBeaconsOther.Select(x => RotationUtils.GetAllRotations(x).ToList()).ToList();
+            int numRotations = matchingBeaconsRotations[0].Count;
+            List<Coord3D> possibleOtherScannerPositions = new();
+
+            // The trick here is that when we find the right rotation, there will be only one possible scanner poisition
+            // if the rotation is bad, the x coords will match with y or Z and then there will be 12 different potential positions
+            for (int i = 0; i < numRotations; i++)
             {
-                List<List<Coord3D>> matchingBeaconsRotations = goodBeaconsOther.Select(x => RotationUtils.GetAllRotations(x).ToList()).ToList();
-                int rotationLength = matchingBeaconsRotations[0].Count;
-                List<Coord3D> possibleOtherScannerPositions = new();
+                List<Coord3D> rotatedBeacons = matchingBeaconsRotations.Select(x => x[i]).ToList(); // get the i-th rotation for all beacons
+                possibleOtherScannerPositions = new();
 
-                // The trick here is that when we find the right rotation, there will be only one possible scanner poisition
-                // if the rotation is bad, the x coords will match with y or Z and then there will be 12 different potential positions
-                for (int i = 0; i < rotationLength; i++)
-                {
-                    List<Coord3D> rotatedBeacons = matchingBeaconsRotations.Select(x => x[i]).ToList();
-                    possibleOtherScannerPositions = new();
+                // Find the real position of the beacon with respect to our beacon scanner pos (known)
+                var realBeaconPosition = goodBeacons.Select(x => x + scannerPosition).ToList();
+                possibleOtherScannerPositions = realBeaconPosition.Zip(rotatedBeacons, (real, rotated) => real-rotated).ToList();
 
-                    for (int j = 0; j < goodBeacons.Count; j++)
-                    {
-                        // Step 1 - Find the real position of the beacon with respect to our beacon scanner pos (known)
-                        var beaconPos = goodBeacons[j];
-                        var otherPos = rotatedBeacons[j];
-                        var realBeaconPosition = beaconPos + scannerPosition;
-                        var otherScannerPosition = realBeaconPosition - otherPos;
-                        possibleOtherScannerPositions.Add(otherScannerPosition);
-                    }
-
-                    if (possibleOtherScannerPositions.Distinct().Count() == 1)
-                    { 
-                        // The registration ends when we translate the beacons of the other scanner
-                        // to the same reference coodinates and rotation as the registered scanner
-                        other.RotationIndex = i;
-                        other.normalizedScannerPos = possibleOtherScannerPositions[0];
-                        other.NormalizeBeacons();
-                    }
+                if (possibleOtherScannerPositions.Distinct().Count() == 1)
+                { 
+                    // The registration ends when we translate the beacons of the other scanner
+                    // to the same reference coodinates and rotation as the registered scanner
+                    other.RotationIndex = i;
+                    other.normalizedScannerPos = possibleOtherScannerPositions[0];
+                    other.NormalizeBeacons();
                 }
             }
-            else
-                return null;
 
             return other.normalizedScannerPos;
         }
@@ -163,6 +155,7 @@ namespace AoC21.Day19
             var sections = ParseUtils.SplitBy(input, "");
             sections.ForEach(x => scanList.Add(new Scan(x)));
 
+            // The first scanner is the reference scanner
             scanList[0].RotationIndex = 0;
             scanList[0].normalizedScannerPos = (0, 0, 0);
             scanList[0].NormalizeBeacons();
@@ -175,29 +168,35 @@ namespace AoC21.Day19
 
             while (nonRegisteredScanners.Count > 0)
             {
+                List<Scan> addedRegScanners = [];
+
                 foreach (var nonRegScan in nonRegisteredScanners)
                     foreach (var regScan in registeredScanners)
-                        regScan.Register(nonRegScan);
-
-                registeredScanners = scanList.Where(x => x.RotationIndex != -1).ToList();
+                    {
+                        if(regScan.Register(nonRegScan) is not null)
+                            addedRegScanners.Add(nonRegScan);
+                    }
+                
+                // We will retry with the new ones, as the missing non registered have already been tested with the previous registered scanners
+                registeredScanners = addedRegScanners;  
                 nonRegisteredScanners = scanList.Where(x => x.RotationIndex == -1).ToList();
             }
             
-            return registeredScanners.SelectMany(x => x.normalizedBeacons).Distinct().Count();
+            return scanList.SelectMany(x => x.normalizedBeacons).Distinct().Count();
         }
 
         int FindLargestManhattan()
         { 
-            _ = RegisterScans();
+            RegisterScans();    // Register the scanners and get their normalized position
 
-            int max = 0;
-            foreach (var scan in scanList)
-                foreach (var scan2 in scanList)
+            var max = 0;
+            for (int i = 0; i < scanList.Count - 1; i++)
+                for (int j = i + 1; j < scanList.Count; j++)
                 { 
-                    var manhDist = scan.normalizedScannerPos.Manhattan(scan2.normalizedScannerPos);
-                    if (manhDist > max)
-                        max = manhDist;
+                    var dist = scanList[i].normalizedScannerPos.Manhattan(scanList[j].normalizedScannerPos);
+                    max  = dist> max ? dist : max;  
                 }
+            
             return max;
         }
 
