@@ -1,5 +1,4 @@
 ﻿using AoC21.Common;
-using System.Data;
 
 namespace AoC21.Day19
 {
@@ -58,7 +57,6 @@ namespace AoC21.Day19
         public int RotationIndex = -1;
         public List<Coord3D> normalizedBeacons = new List<Coord3D>();
         public Coord3D normalizedScannerPos = new Coord3D(0, 0, 0);
-        
 
         public Scan(List<string> inputSection)
         {
@@ -69,6 +67,9 @@ namespace AoC21.Day19
             inputValues.ForEach(x => beacons.Add(new Coord3D(x[0], x[1], x[2])));
 
             distances = new double[beacons.Count][];
+            
+            // Distances between all beacons are key - if we have a subset of beacons that are visible by two scanners
+            // the distances between them will be the same
             for (int i = 0; i < beacons.Count; i++)
             {
                 distances[i] = new double[beacons.Count];
@@ -138,6 +139,8 @@ namespace AoC21.Day19
 
                     if (possibleOtherScannerPositions.Distinct().Count() == 1)
                     { 
+                        // The registration ends when we translate the beacons of the other scanner
+                        // to the same reference coodinates and rotation as the registered scanner
                         other.RotationIndex = i;
                         other.normalizedScannerPos = possibleOtherScannerPositions[0];
                         other.NormalizeBeacons();
@@ -183,8 +186,22 @@ namespace AoC21.Day19
             return registeredScanners.SelectMany(x => x.normalizedBeacons).Distinct().Count();
         }
 
+        int FindLargestManhattan()
+        { 
+            _ = RegisterScans();
+
+            int max = 0;
+            foreach (var scan in scanList)
+                foreach (var scan2 in scanList)
+                { 
+                    var manhDist = scan.normalizedScannerPos.Manhattan(scan2.normalizedScannerPos);
+                    if (manhDist > max)
+                        max = manhDist;
+                }
+            return max;
+        }
+
         public int Solve(int part = 1)
-            => RegisterScans();
-        
+            => part == 1? RegisterScans() : FindLargestManhattan();
     }
 }
