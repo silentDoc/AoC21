@@ -67,6 +67,6 @@ namespace AoC21.Day20
         }
 
         public int Solve(int part = 1)
-            => FindPixelsLit(2);
+            => part == 1 ? FindPixelsLit(2) : FindPixelsLit(50);
     }
 }
