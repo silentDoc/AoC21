@@ -85,14 +85,9 @@
 
         public IEnumerable<Coord2D> GetNeighbors8()
         {
-            yield return new Coord2D(x + 1, y);
-            yield return new Coord2D(x + 1, y - 1);
-            yield return new Coord2D(x, y - 1);
-            yield return new Coord2D(x - 1, y - 1);
-            yield return new Coord2D(x - 1, y);
-            yield return new Coord2D(x - 1, y + 1);
-            yield return new Coord2D(x, y + 1);
-            yield return new Coord2D(x + 1, y + 1);
+            yield return new Coord2D(x - 1, y - 1); yield return new Coord2D(x, y - 1);  yield return new Coord2D(x + 1, y - 1);
+            yield return new Coord2D(x - 1, y);                                          yield return new Coord2D(x + 1, y);
+            yield return new Coord2D(x - 1, y + 1); yield return new Coord2D(x, y + 1);  yield return new Coord2D(x + 1, y + 1);
         }
 
         public override int GetHashCode()
