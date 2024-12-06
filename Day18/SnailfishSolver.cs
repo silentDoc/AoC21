@@ -205,7 +205,6 @@ namespace AoC21.Day18
         int SumAll()
         {
             SnailNum acum = snailNumbers[0];
-            SnailNum number = null;
 
             foreach (var num in snailNumbers.Skip(1))
             {

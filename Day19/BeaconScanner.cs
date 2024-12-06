@@ -21,23 +21,12 @@ namespace AoC21.Day19
         public static IEnumerable<Coord3D> GetAllRotations(Coord3D point)
         {
             // Define rotations as combinations of ras and rbs
-            var ras = new List<Transform>
-                {
-                    NullTrans,
-                    RotY,
-                    Compose(RotY, RotY),
-                    Compose(Compose(RotY, RotY), RotY),
-                    RotZ,
-                    Compose(RotZ, Compose(RotZ, RotZ))
-                };
+            List<Transform> ras = [  NullTrans,
+                                     RotY, Compose(RotY, RotY), Compose(Compose(RotY, RotY), RotY),
+                                     RotZ, Compose(RotZ, Compose(RotZ, RotZ)) ];
 
-            var rbs = new List<Transform>
-                {
-                    NullTrans,
-                    RotX,
-                    Compose(RotX, RotX),
-                    Compose(Compose(RotX, RotX), RotX)
-                };
+            List<Transform> rbs = [  NullTrans,
+                                     RotX, Compose(RotX, RotX), Compose(Compose(RotX, RotX), RotX)];
 
             // Apply all combinations of ras and rbs to the point
             foreach (var ra in ras)
@@ -113,6 +102,7 @@ namespace AoC21.Day19
                 }
             }
 
+            // If we don't have enough beacons in common, the scanners do not overlap
             if (goodBeacons.Count < 12)
                 return null;
 
@@ -133,12 +123,14 @@ namespace AoC21.Day19
                 possibleOtherScannerPositions = realBeaconPosition.Zip(rotatedBeacons, (real, rotated) => real-rotated).ToList();
 
                 if (possibleOtherScannerPositions.Distinct().Count() == 1)
-                { 
+                {
+                    // The twelve beacons yield a single possible position :)
                     // The registration ends when we translate the beacons of the other scanner
                     // to the same reference coodinates and rotation as the registered scanner
                     other.RotationIndex = i;
                     other.normalizedScannerPos = possibleOtherScannerPositions[0];
                     other.NormalizeBeacons();
+                    break;
                 }
             }
 
@@ -188,16 +180,8 @@ namespace AoC21.Day19
         int FindLargestManhattan()
         { 
             RegisterScans();    // Register the scanners and get their normalized position
-
-            var max = 0;
-            for (int i = 0; i < scanList.Count - 1; i++)
-                for (int j = i + 1; j < scanList.Count; j++)
-                { 
-                    var dist = scanList[i].normalizedScannerPos.Manhattan(scanList[j].normalizedScannerPos);
-                    max  = dist> max ? dist : max;  
-                }
-            
-            return max;
+            var normalizedScannerPositions = scanList.Select(x => x.normalizedScannerPos).ToList();
+            return normalizedScannerPositions.SelectMany(x => normalizedScannerPositions.Select(y => y.Manhattan(x))).Max();
         }
 
         public int Solve(int part = 1)
