@@ -29,7 +29,7 @@
     {
         Player player1;
         Player player2;
-        new Dictionary<(Player, Player), (long, long)> memoize = new(); // for part 2
+        Dictionary<(Player, Player), (long, long)> memoize = new(); // for part 2
 
         public void ParseInput(List<string> input)
         {
