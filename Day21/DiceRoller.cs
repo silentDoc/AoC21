@@ -3,18 +3,16 @@
     static class DiracDice
     {
         public static IEnumerable<int> ThrowDice() 
-            => from i in new[] { 1, 2, 3 }
-               from j in new[] { 1, 2, 3 }
-               from k in new[] { 1, 2, 3 }
-               select i + j + k;
+            => new[] { 1, 2, 3 }.SelectMany(i => new[] { 1, 2, 3 }, (i, j) => new { i, j })
+                                .SelectMany(pair => new[] { 1, 2, 3 }, (pair, k) => pair.i + pair.j + k);
     }
 
     static class D100Dice
     {
         public static IEnumerable<int> ThrowDice()
         {
-                for (int i = 1;i<10000;i++)
-                    yield return (i-1) % 100 + 1;
+            for (int i = 1;i<10000;i++)
+                yield return (i-1) % 100 + 1;
         }
     }
 
