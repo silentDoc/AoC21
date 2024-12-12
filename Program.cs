@@ -7,9 +7,9 @@ namespace AoC21
         static void Main(string[] args)
         {
             int day = 22;
-            int part = 1;
-            bool test = !false;
-            int testNum = 0;
+            int part = 2;
+            bool test = false;
+            int testNum = 1;
 
             string input = "./Input/day" + day.ToString("00");
             input += (test) ? "_test" + (testNum > 0 ? testNum.ToString() : "") + ".txt" : ".txt";
@@ -219,9 +219,9 @@ namespace AoC21
         static string day22(string input, int part)
         {
             var lines = File.ReadAllLines(input).ToList();
-            //Day22 daySolver = new();
-            //daySolver.ParseInput(lines);
-            return "";//daySolver.Solve(part).ToString();
+            Day22.CuboidRebooter daySolver = new();
+            daySolver.ParseInput(lines);
+            return daySolver.Solve(part).ToString();
         }
     }
 }
