@@ -1,5 +1,4 @@
 ﻿using AoC21.Common;
-using System.Diagnostics;
 
 namespace AoC21.Day23
 {
@@ -16,17 +15,17 @@ namespace AoC21.Day23
 
     internal class AmphiMover
     {
-        Dictionary<Coord2D, char> Map = new();
+        Dictionary<Coord2D, char> map = new();
 
         void ParseLine(int row, string line)
-            => line.Index().ToList().ForEach(c => Map[(c.Index, row)] = c.Item);
+            => line.Index().ToList().ForEach(c => map[(c.Index, row)] = c.Item);
 
         public void ParseInput(List<string> input)
             => input.Index().ToList().ForEach(x => ParseLine(x.Index, x.Item));
 
         int SolveMap()
         {
-            var initialState = GetState(Map);
+            var initialState = GetState();
             var visited = new HashSet<State>();
             var active = new PriorityQueue<State, int>();
             active.Enqueue(initialState, 0);
@@ -48,16 +47,14 @@ namespace AoC21.Day23
 
                 foreach (var amphipod in amphipods)
                 {
-                    var possibleMoves = GetAllMoves(amphipod, amphipods, Map, hallwayPositions).ToList();
+                    var possibleMoves = GetAllMoves(amphipod, amphipods, hallwayPositions).ToList();
 
                     foreach (var move in possibleMoves)
                     {
                         var index = amphipods.IndexOf(amphipod);
                         var newAmphipod = amphipod with { position = move.position};
                         var newAmphipods = amphipods[..index]
-                            .Append(newAmphipod)
-                            .Concat(amphipods[(index + 1)..])
-                            .ToList();
+                            .Append(newAmphipod).Concat(amphipods[(index + 1)..]).ToList();
 
                         var newState = new State(newAmphipods, energy + amphipod.EnergyCost * move.Steps);
                         active.Enqueue(newState, newState.Energy);
@@ -68,7 +65,7 @@ namespace AoC21.Day23
             throw new Exception("No solution found!");
         }
 
-        State GetState(Dictionary<Coord2D, char> map)
+        State GetState()
         {
             var amphipods = new List<Amphipod>();
             foreach (var element in map)
@@ -91,24 +88,24 @@ namespace AoC21.Day23
             return new State(amphipods, 0);
         }
 
-        IEnumerable<Move> GetAllMoves(Amphipod amphipod, List<Amphipod> amphipods, Dictionary<Coord2D, char> map, List<Coord2D> hallway)
+        IEnumerable<Move> GetAllMoves(Amphipod amphipod, List<Amphipod> amphipods, List<Coord2D> hallway)
         {
-            if (IsAtFinalDestination(amphipod, amphipods, map))
+            if (IsAtFinalDest(amphipod, amphipods))
                 yield break;
 
-            if (TryGetFinalDest(amphipod, amphipods, map, out var finalDestination))
-                if (TryReachPos(amphipod, finalDestination, amphipods, map, out var move))
+            if (TryGetFinalDest(amphipod, amphipods, out var finalDestination))
+                if (TryReachPos(amphipod, finalDestination, amphipods, out var move))
                     yield return move;
 
             if (amphipod.position.y == 1)
                 yield break;
 
             foreach (var position in hallway)
-                if (TryReachPos(amphipod, position, amphipods, map, out var move))
+                if (TryReachPos(amphipod, position, amphipods, out var move))
                     yield return move;
         }
 
-        private static bool TryReachPos(Amphipod amphipod, Coord2D destination, List<Amphipod> amphipods, Dictionary<Coord2D, char> map, out Move? move)
+        bool TryReachPos(Amphipod amphipod, Coord2D destination, List<Amphipod> amphipods, out Move? move)
         {
             var visited = new HashSet<Coord2D>();
             var active = new Queue<(Coord2D pos, int Steps)>();
@@ -144,28 +141,28 @@ namespace AoC21.Day23
             return false;
         }
 
-        bool TryGetFinalDest(Amphipod amphipod, List<Amphipod> amphipods, Dictionary<Coord2D, char> map, out Coord2D finalDestination)
+        bool TryGetFinalDest(Amphipod amphipod, List<Amphipod> amphipods, out Coord2D finalDestination)
         {
             var (_, type, _, targetCol) = amphipod;
             finalDestination = (-1, -1);
 
-            if (RoomContainsTypeThatDoesNotMatch(targetCol, type, amphipods))
+            if (RoomHasOther(targetCol, type, amphipods))
                 return false;
             
             var minRow = 2;
-            var maxRow = 3;
+            var maxRow = map.Keys.Max(k => k.y) - 1;
 
             for (var row = maxRow; row >= minRow; row--)
-                if (IsEmptySpace((targetCol,row), amphipods))
+                if (IsEmpty((targetCol,row), amphipods))
                 {
                     finalDestination = (targetCol, row);
                     return true;
                 }
 
-            throw new UnreachableException("F!");
+            throw new Exception("F!");
         }
 
-        private static bool IsAtFinalDestination(Amphipod amphipod, List<Amphipod> amphipods, Dictionary<Coord2D, char> map)
+        bool IsAtFinalDest(Amphipod amphipod, List<Amphipod> amphipods)
         {
             var (position, type, _, targetCol) = amphipod;
 
@@ -182,10 +179,10 @@ namespace AoC21.Day23
         bool IsFinalState(State state) 
             =>state.Amphipods.All(a => a.position.x == a.TargetCol);
 
-        bool RoomContainsTypeThatDoesNotMatch(int targetCol, char type, IEnumerable<Amphipod> amphipods) =>
+        bool RoomHasOther(int targetCol, char type, IEnumerable<Amphipod> amphipods) =>
             amphipods.Any(a => a.position.x == targetCol && a.Type != type);
 
-        bool IsEmptySpace(Coord2D position, IEnumerable<Amphipod> amphipods) =>
+        bool IsEmpty(Coord2D position, IEnumerable<Amphipod> amphipods) =>
             !amphipods.Any(a => a.position == position);
 
         public int Solve(int part = 1)

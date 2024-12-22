@@ -8,8 +8,8 @@ namespace AoC21
         {
             int day = 23;
             int part = 1;
-            bool test = false;
-            int testNum = 0;
+            bool test = !false;
+            int testNum = 1;
 
             string input = "./Input/day" + day.ToString("00");
             input += (test) ? "_test" + (testNum > 0 ? testNum.ToString() : "") + ".txt" : ".txt";
