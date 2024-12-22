@@ -15,7 +15,7 @@
         public void ParseInput(List<string> lines)
            => lines.ForEach(x => sourceCode.Add(ParseLine(x)));
 
-        long HackAlu()
+        long HackAlu(int part = 1)
         {
             var digits = Enumerable.Range(1, 9).ToList();
 
@@ -24,9 +24,13 @@
             var stack = new Stack<int>();
 
             Dictionary<int, int> maxDigits = new();
+            Dictionary<int, int> minDigits = new();
 
             foreach (var k in Enumerable.Range(0, 14))
+            {
                 maxDigits[k] = -1;
+                minDigits[k] = 100000;
+            }
 
             for (var j = 0; j < 14; j++)
             {
@@ -42,11 +46,20 @@
                         var b = a + increment;
 
                         if (digits.Contains(b))
+                        {
                             if (a > maxDigits[i])
                             {
                                 maxDigits[i] = a;
                                 maxDigits[j] = b;
                             }
+
+                            if (a < minDigits[i])
+                            {
+                                minDigits[i] = a;
+                                minDigits[j] = b;
+                            }
+
+                        }
                     }
 
                 }
@@ -54,13 +67,15 @@
 
             long res = 0;
 
+            var digitDict = part == 1 ? maxDigits : minDigits;
+
             foreach (var k in Enumerable.Range(0, 14))
-                res = res * 10 + maxDigits[k];
+                res = res * 10 + digitDict[k];
 
             return res;
         }
 
         public long Solve(int part = 1)
-            => HackAlu();
+            => HackAlu(part);
     }
 }
