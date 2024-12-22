@@ -8,7 +8,7 @@ namespace AoC21
         {
             int day = 25;
             int part = 1;
-            bool test = !false;
+            bool test = false;
             int testNum = 0;
 
             string input = "./Input/day" + day.ToString("00");
@@ -43,6 +43,7 @@ namespace AoC21
                 22 => day22(input, part),
                 23 => day23(input, part),
                 24 => day24(input, part),
+                25 => day25(input, part),
                 _ => throw new ArgumentException("Wrong day number - unimplemented")
             };
             st.Stop();
@@ -244,9 +245,9 @@ namespace AoC21
         static string day25(string input, int part)
         {
             var lines = File.ReadAllLines(input).ToList();
-            //Day25 daySolver = new();
-            //daySolver.ParseInput(lines);
-            return ""; // daySolver.Solve(part).ToString();
+            Day25.CucumberNavi daySolver = new();
+            daySolver.ParseInput(lines);
+            return daySolver.Solve(part).ToString();
         }
     }
 }
