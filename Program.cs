@@ -6,9 +6,9 @@ namespace AoC21
     {
         static void Main(string[] args)
         {
-            int day = 24;
-            int part = 2;
-            bool test = false;
+            int day = 25;
+            int part = 1;
+            bool test = !false;
             int testNum = 0;
 
             string input = "./Input/day" + day.ToString("00");
@@ -240,6 +240,13 @@ namespace AoC21
             Day24.AluComputer daySolver = new();
             daySolver.ParseInput(lines);
             return daySolver.Solve(part).ToString();
+        }
+        static string day25(string input, int part)
+        {
+            var lines = File.ReadAllLines(input).ToList();
+            //Day25 daySolver = new();
+            //daySolver.ParseInput(lines);
+            return ""; // daySolver.Solve(part).ToString();
         }
     }
 }
