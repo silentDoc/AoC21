@@ -4,31 +4,34 @@ Let's study what MONAD does with the inputs to try figure out what the input sho
 
 Monad has 14 chunks of 18 lines that look very similar (each chunk starts with the input instruction). From my input:
 
-|#| Chunk 1    | Chunk 2   | Chunk 3   | Pseudocode           | Comments                      |
-|--|:----------|:----------|:----------|:---------------------|:------------------------------|
-|1 | `inp w`   | `inp w`   | `inp w`   | `w = input_digit`    | Get input digit               |
-|2 | `mul x 0` | `mul x 0` | `mul x 0` | `x = x * 0`          | Reset x                       |
-|3 | `add x z` | `add x z` | `add x z` | `x = x + z`          | Add z                         |
-|4 | `mod x 26`| `mod x 26`| `mod x 26`| `x = x % 26`         | Mod 26                        |
-|5 | `div z 1` | `div z 1` | `div z 1` | `z = z / 1`          | Keeps z value from last chunk |
-|6 | `add x 11`| `add x 12`| `add x 10`| `x = x + 11`         |	<-- Only change in chunks     |
-|7 | `eql x w` | `eql x w` | `eql x w` | `x = (x==w) ? 1 : 0` |                               |
-|8 | `eql x 0` | `eql x 0` | `eql x 0` | `x = (x==0) ? 1 : 0` | x != w -> 1                   |
-|9 | `mul y 0` | `mul y 0` | `mul y 0` | `y = y * 0`          | Reset y                       |
-|10| `add y 25`| `add y 25`| `add y 25`| `y = y + 25`         | Add 25                        |
-|11| `mul y x` | `mul y x` | `mul y x` | `y = y * x`          | Product by x (0 or 1)         |
-|12| `add y 1` | `add y 1` | `add y 1` | `y++`                | Increment                     |
-|13| `mul z y` | `mul z y` | `mul z y` | `z = z * y`          | **z is assigned**             |
-|14| `mul y 0` | `mul y 0` | `mul y 0` | `y = y * 0`          | Reset y                       |
-|15| `add y w` | `add y w` | `add y w` | `y = y + w`          | y = w                         |
-|16| `add y 8` | `add y 8` | `add y 8` | `y = y + 8`          | y += 8                        |
-|17| `mul y x` | `mul y x` | `mul y x` | `y = y * x`          | y *= x (0 or 1)               |
-|18| `add z y` | `add z y` | `add z y` | `z = z + y`          | **z is assigned**             | 
+|#| Chunk 1    | Chunk 2   | Chunk 3   | Chunk 4   | Pseudocode (Chunk 1) | Comments                      |
+|--|:----------|:----------|:----------|:----------|:---------------------|:------------------------------|
+|1 | `inp w`   | `inp w`   | `inp w`   | `inp w`   | `w = input_digit`    | Get input digit               |
+|2 | `mul x 0` | `mul x 0` | `mul x 0` | `mul x 0` | `x = x * 0`          | Reset x                       |
+|3 | `add x z` | `add x z` | `add x z` | `add x z` | `x = x + z`          | Add z                         |
+|4 | `mod x 26`| `mod x 26`| `mod x 26`| `mod x 26`| `x = x % 26`         | Mod 26                        |
+|5 | `div z 1` | `div z 1` | `div z 1` | `div z 26`| `z = z / 1`          | Changes depending on chunk!!  |
+|6 | `add x 11`| `add x 12`| `add x 10`| `add x -8`| `x = x + 11`         |	Changes depending on chunk!!  |
+|7 | `eql x w` | `eql x w` | `eql x w` | `eql x w` | `x = (x==w) ? 1 : 0` |                               |
+|8 | `eql x 0` | `eql x 0` | `eql x 0` | `eql x 0` | `x = (x==0) ? 1 : 0` | x != w -> 1                   |
+|9 | `mul y 0` | `mul y 0` | `mul y 0` | `mul y 0` | `y = y * 0`          | Reset y                       |
+|10| `add y 25`| `add y 25`| `add y 25`| `add y 25`| `y = y + 25`         | Add 25                        |
+|11| `mul y x` | `mul y x` | `mul y x` | `mul y x` | `y = y * x`          | Product by x (0 or 1)         |
+|12| `add y 1` | `add y 1` | `add y 1` | `add y 1` | `y++`                | Increment                     |
+|13| `mul z y` | `mul z y` | `mul z y` | `mul z y` | `z = z * y`          | **z is assigned**             |
+|14| `mul y 0` | `mul y 0` | `mul y 0` | `mul y 0` | `y = y * 0`          | Reset y                       |
+|15| `add y w` | `add y w` | `add y w` | `add y w` | `y = y + w`          | y = w                         |
+|16| `add y 8` | `add y 8` | `add y 8` | `add y 10`| `y = y + 8`          | y += 8 , Changes depending on chunk!!                       |
+|17| `mul y x` | `mul y x` | `mul y x` | `mul y x` | `y = y * x`          | y *= x (0 or 1)               |
+|18| `add z y` | `add z y` | `add z y` | `add z y` | `z = z + y`          | **z is assigned**             | 
 
 
 I've pasted only the 3 first chunks above, along with pseudo code and comments. Notice two things:
 
-- Line 6 is the only change each chunk has.
+- The lines that change are lines
+	- Line 5 - Some chunks have z = z/1 some others z = z/26
+	- Line 6 - There is a different value added by each chunk
+	- Line 16 - The value that is added to y also changes by chunk
 - Z is only assigned in three places (line 5 means that Z is the one from the last chunk)
 
 Let's dissect a little bit deeper and put together some of the lines above:
@@ -59,6 +62,7 @@ The answer is **all of them but the Z** (which makes sense given the problem).
 Basically, for each chunk we are testing the following:
 
 ```
+(z = z) OR (z = z/26) // Depending on the chunk
 x = (z % 26) + (chunk value)
 if( x != digit)
    y = 26
@@ -68,7 +72,7 @@ else
 z *=y
 
 if( x != digit)
-	y = (digit + 8)
+	y = digit + (ohter_value_depending_on_chunk)
 else 
    y = 0
 
@@ -79,3 +83,6 @@ These 2 ifs are the ones that transform z. We have to find a digit for each chun
 
 The code above can be seen as an operation betwen the digit and the chunk value. If the operation(digit) == chunk_value ; we've got a digit. 
 
+It looks like the blocks with `div z 1` complement the ones with `div z 26`. 
+
+The operation seems to be an increment (a sum)
